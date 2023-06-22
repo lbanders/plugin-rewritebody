@@ -66,6 +66,17 @@ func New(_ context.Context, next http.Handler, config *Config, name string) (htt
 }
 
 func (r *rewriteBody) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
+	hijacked := false
+	if h, ok := w.(http.Hijacker); ok {
+  		hijacked = h.Hijacked
+	}
+
+	if hijacked {
+		fmt.Println("The connection is hijacked")
+		log.Println("The connection is hijacked")
+		return
+	}
+
 	wrappedWriter := &responseWriter{
 		lastModified:   r.lastModified,
 		ResponseWriter: rw,
